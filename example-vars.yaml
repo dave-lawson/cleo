@@ -4,9 +4,6 @@ aws_access_key: XXXXXX
 aws_secret_key: XXXXXX
 aws_ssh_keypair_name: AWS
 
-#System Settings
-php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
-
 #MySQL Settings
 mysql_root_password: "rootdbbadpassword"
 mysql_db: "wordpress"
