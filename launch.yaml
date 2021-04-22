@@ -112,7 +112,7 @@
 
   - name: Install PHP Extensions
     apt: name={{ item }} update_cache=yes state=latest
-    loop: "{{ php_modules }}"
+    loop: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
     tags: [ system ]
 
 # Apache Configuration
