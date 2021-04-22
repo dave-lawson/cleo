@@ -1,0 +1,58 @@
+There is an example-vars.yaml in the repo, the only thing that absolutely has to 
+be changed there is the AWS credentials, otherwise the values are bad but 
+workable.  Note that the current AWS credential stanza assumes that you have an 
+ssh keypair in AWS named "AWS".
+
+An /etc/hosts entry or DNS record for the server that matches the hostname 
+specified in the vars.yaml file will make the site look substantially better, 
+but it will function without it.
+
+To deploy the site run:
+
+./bootstrap.sh                  # will install dependencies, including ansible
+ansible-playbook -v launch.yaml # actually deploys the site
+
+The IP address of the EC2 instance will be in the play recap output at the end.
+
+Sources:
+
+Most of these tasks have been cribbed from various sources and adapted lightly.
+
+This for the dynamic connection to the spawned instance:
+https://medium.com/swlh/configuring-web-server-on-ec2-instance-using-ansible-in-one-click-83139c4cc55e
+
+And this for the Apache/Wordpress setup:
+https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-install-and-set-up-wordpress-with-lamp-on-ubuntu-18-04
+
+And for the Docker setup:
+https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-install-and-set-up-docker-on-ubuntu-18-04
+
+The wp-cli install task came from here:
+https://github.com/tlezotte/ansible-wp-cli
+
+And this twigged me to its existence:
+https://medium.com/@beBrllnt/from-30-minutes-to-10-seconds-automating-wordpress-setup-5ff7526942c0
+
+The Wordpress XMLRPC library is from here:
+https://python-wordpress-xmlrpc.readthedocs.io/en/latest/index.html
+
+Known issues:
+
+* There appears to be some sort of race in the aptitude install, probably 
+  related to cloud-init actually finishing. Occasionally you have a badly 
+formatted sources.list or other apt related errors.  I've added a status check
+and retry to that task to mitigate this.
+
+* The DB host setting for Wordpress is non-dynamic and fragile, it assumes the 
+  DB host will be the first Docker container on the host, which is a safe 
+assumption in this use case but would need to be fixed for a production role.
+
+* The post to wordpress script has relatively poor credential handling but under 
+  the circumstances it's likely not worth locking down further. Making the 
+script only readable by its owner is a reasonable basic precaution, the ubuntu 
+user has passwordless sudo so if it has been compromised the site has larger 
+problems.
+
+* Wordpress static resources require that your WP hostname resolves either via 
+  an /etc/hosts entry or by actually being in DNS.  There are some ways to avoid 
+this I believe but it feels out of scope.
